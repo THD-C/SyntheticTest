@@ -1,0 +1,26 @@
+name: Run Synthetic Tests
+
+
+on:
+  workflow_dispatch:
+
+jobs:  
+  CheckIfRunning:
+    uses: THD-C/The_THDc_App/.github/workflows/check-self-hosted-runner.yml@main
+    secrets: inherit
+  
+  RunSyntheticTests:
+    needs: CheckIfRunning
+    runs-on: self-hosted
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        
+      - name: Run Synthetic Tests
+        shell: pwsh
+        run: |
+          docker compose up --force-recreate
+
+          if ($(docker compose ps -a --format=json | ConvertFrom-Json).ExitCode -eq 0){
+            throw "Synthetic Tests failed"
+          }

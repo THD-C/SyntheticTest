@@ -1,0 +1,12 @@
+services:
+  SyntheticTests:
+    build:
+        dockerfile: Dockerfile
+    image: thd/synthetictests
+    container_name: THD_SyntheticTests
+    environment:
+      - BROWSER_ENABLED:False
+    volumes:
+      - ./:/code/app
+    extra_hosts:
+    - "thdc:10.0.10.114"
