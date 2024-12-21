@@ -3,6 +3,9 @@ name: Run Synthetic Tests
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
 
 jobs:  
   CheckIfRunning:
@@ -16,21 +19,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Remove container if exists
-        run: echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-        
-      - name: Build Docker Image
-        run: docker compose build
-
-      - name: Run Synthetic Tests
-        shell: pwsh
+      - name: Setup Python environment
         run: |
-          docker compose up --force-recreate
-          
-          $ContainerStatus = $(docker compose ps -a --format=json | ConvertFrom-Json)
-          
-          docker compose down
-
-          if ($ContainerStatus -ne 0){
-            throw "Synthetic Tests failed"
-          }
+          python3 -m venv ./.venv
+          source ./.venv/bin/activate
+          pip install -r requirements.txt
+      
+      - name: Run Synthetic Tests
+        run: |
+          source ./.venv/bin/activate
+          pytest
+          # python -m pytest -v tests/synthetic_tests.py
