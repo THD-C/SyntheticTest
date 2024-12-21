@@ -39,6 +39,8 @@ def test_authentication_custom_user():
             
         login_email_result = login(page, f"{username}@wp.pl", password)
         
+        browser.close()
+        
         assert register_result is True
         assert login_username_result is True
         assert login_email_result is True
