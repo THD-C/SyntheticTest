@@ -1,7 +1,8 @@
 FROM python:3.12
 
-RUN mkdir /code
+USER thdc-user
 
+RUN mkdir /code
 WORKDIR /code
 
 COPY ./requirements.txt /code/requirements.txt
