@@ -31,7 +31,7 @@ def register(page: Page, username: str = cfg.USERNAME, email: str = cfg.E_MAIL, 
     
     try:
         page.wait_for_url(cfg.LANDING_PAGE, timeout=5000)
-    except TimeoutError:
+    except Exception:
         print("Registration failed")
         return False
     
