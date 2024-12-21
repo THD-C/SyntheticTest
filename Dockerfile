@@ -1,7 +1,5 @@
 FROM python:3.12
 
-USER thdc-user
-
 RUN mkdir /code
 WORKDIR /code
 
@@ -11,4 +9,5 @@ RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
 RUN playwright install \
     && playwright install-deps
 
+USER thdc-user
 CMD ["pytest"]
