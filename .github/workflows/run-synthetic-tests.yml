@@ -16,11 +16,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         
+      - name: Build Docker Image
+        run: docker compose build
+
       - name: Run Synthetic Tests
         shell: pwsh
         run: |
           docker compose up --force-recreate
 
-          if ($(docker compose ps -a --format=json | ConvertFrom-Json).ExitCode -eq 0){
+          if ($(docker compose ps -a --format=json | ConvertFrom-Json).ExitCode -ne 0){
             throw "Synthetic Tests failed"
           }
