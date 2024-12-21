@@ -1,6 +1,5 @@
 from playwright.sync_api import sync_playwright
 import uuid
-import os
 import src.Config as cfg
 from src.authentication import login, register
 
@@ -29,5 +28,17 @@ def test_authentication_custom_user():
         password = f"test_{uuid.uuid4()}"
         
         register_result = register(page, username, f"{username}@wp.pl", password)
+        if register_result:
+            page.get_by_title("Profile").click()
+            page.get_by_text("Log out").click()
+        
+        login_username_result = login(page, username, password)
+        if login_username_result:
+            page.get_by_title("Profile").click()
+            page.get_by_text("Log out").click()
+            
+        login_email_result = login(page, f"{username}@wp.pl", password)
         
         assert register_result is True
+        assert login_username_result is True
+        assert login_email_result is True
