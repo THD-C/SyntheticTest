@@ -2,14 +2,17 @@ from playwright.sync_api import sync_playwright
 import uuid
 from src.authentication import login, register
 from src.Helpers.setupPlaywrightBrowser import setup
-
+import src.Config as cfg
 
 def test_authentication_default_user():
     with sync_playwright() as playwright:
         page, browser = setup(playwright)
 
+        login_result = False
         register_result = register(page)
-
+        
+        page.goto(cfg.LANDING_PAGE)
+        
         if not register_result:
             login_result = login(page)
 
