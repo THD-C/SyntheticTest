@@ -28,11 +28,11 @@ async def test_create_wallet_data():
         
         # Select USD from list and save
         await page.get_by_placeholder("Select...").click()
-        await page.get_by_text("USD").click()
+        await page.get_by_text("usd", exact=True).click()
         await page.get_by_role("button", name="Save", exact=True).dispatch_event('click')
         
         # Check if wallet was created
         await expect(page.locator("td[aria-describedby*='dx-col-3']").filter(has_text="USD")).to_have_count(1)
 
-        browser.close()
+        await browser.close()
             
