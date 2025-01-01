@@ -5,6 +5,39 @@ from src.Helpers.setupPlaywrightBrowser import setup_async
 import pytest
 import asyncio
 
+@pytest.mark.asyncio
+async def test_read_personal_data():
+    async with async_playwright() as playwright:
+        page, browser = await setup_async(playwright)
+        
+        # Login
+        await page.get_by_text("Log in").click()
+        await page.wait_for_url(cfg.LOGIN_PAGE, timeout=5000)
+        await page.get_by_label("E-mail or username").fill(cfg.USERNAME)
+        await page.get_by_label("Password").fill(cfg.PASSWORD)
+        await page.get_by_text("Log in").click()
+        
+        # Open context menu
+        await page.get_by_title("Profile").click()
+
+        # Navigate to personal data page
+        await page.get_by_text("Profile").click()
+
+        # Check if the data is correct
+        await expect(page.get_by_label("Username")).to_have_value("admin", timeout=5000)
+        await expect(page.get_by_label("E-mail")).to_have_value("admin@thdc.pl", timeout=5000)
+
+        # Check user data
+        await expect(page.get_by_label("Username")).to_have_value(cfg.USERNAME, timeout=5000)
+        await expect(page.get_by_label("E-mail")).to_have_value(cfg.E_MAIL, timeout=5000)
+        await expect(page.get_by_label("Country")).to_have_value("Poland", timeout=5000)
+        await expect(page.get_by_label("City")).to_have_value("Lodz", timeout=5000)
+        await expect(page.get_by_label("Postal code")).to_have_value("90-924", timeout=5000)
+        await expect(page.get_by_label("Street")).to_have_value("Zeromskiego", timeout=5000)
+        await expect(page.get_by_label("Building")).to_have_value("116", timeout=5000)
+        await expect(page.get_by_label("Country")).to_have_value("Poland", timeout=5000)
+        
+        await browser.close()
 
 @pytest.mark.asyncio
 async def test_fill_in_personal_data():
