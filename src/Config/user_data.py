@@ -1,3 +1,3 @@
-USERNAME = "test"
-PASSWORD = "veo;vieovineo;vien"
-E_MAIL="test@wp.pl"
+USERNAME = "admin"
+PASSWORD = "admin"
+E_MAIL="admin@thdc.pl"

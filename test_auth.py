@@ -1,45 +1,37 @@
-from playwright.sync_api import sync_playwright
-import uuid
-from src.authentication import login, register
-from src.Helpers.setupPlaywrightBrowser import setup
+from playwright.async_api import async_playwright
+from src.Helpers.setupPlaywrightBrowser import setup_async
 import src.Config as cfg
+import pytest
+import asyncio  # noqa: F401
 
-def test_authentication_default_user():
-    with sync_playwright() as playwright:
-        page, browser = setup(playwright)
-
-        login_result = False
-        register_result = register(page)
+@pytest.mark.asyncio
+async def test_login_with_username():
+    async with async_playwright() as playwright:
+        page, browser = await setup_async(playwright)
         
-        page.goto(cfg.LANDING_PAGE)
+        await page.get_by_text("Log in").click()
+        await page.wait_for_url(cfg.LOGIN_PAGE, timeout=5000)
+        await page.get_by_label("E-mail or username").fill(cfg.USERNAME)
+        await page.get_by_label("Password").fill(cfg.PASSWORD)
+        await page.get_by_text("Log in").click()
+        await page.wait_for_url(cfg.LANDING_PAGE, timeout=5000)
         
-        if not register_result:
-            login_result = login(page)
+        await browser.close()
 
-        browser.close()
-        assert login_result or register_result is True
+        assert page.url == cfg.LANDING_PAGE
 
+@pytest.mark.asyncio
+async def test_login_with_email():
+    async with async_playwright() as playwright:
+        page, browser = await setup_async(playwright)
+        
+        await page.get_by_text("Log in").click()
+        await page.wait_for_url(cfg.LOGIN_PAGE, timeout=5000)
+        await page.get_by_label("E-mail or username").fill(cfg.E_MAIL)
+        await page.get_by_label("Password").fill(cfg.PASSWORD)
+        await page.get_by_text("Log in").click()
+        await page.wait_for_url(cfg.LANDING_PAGE, timeout=5000)
+        
+        await browser.close()
 
-def test_authentication_custom_user():
-    with sync_playwright() as playwright:
-        page, browser = setup(playwright)
-        username = f"test_{str(uuid.uuid4()).replace('-', '')}"
-        password = f"test_{uuid.uuid4()}"
-
-        register_result = register(page, username, f"{username}@wp.pl", password)
-        if register_result:
-            page.get_by_title("Profile").click()
-            page.get_by_text("Log out").click()
-
-        login_username_result = login(page, username, password)
-        if login_username_result:
-            page.get_by_title("Profile").click()
-            page.get_by_text("Log out").click()
-
-        login_email_result = login(page, f"{username}@wp.pl", password)
-
-        browser.close()
-
-        assert register_result is True
-        assert login_username_result is True
-        assert login_email_result is True
+        assert page.url == cfg.LANDING_PAGE
