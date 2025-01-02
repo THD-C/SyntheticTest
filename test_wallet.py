@@ -79,7 +79,8 @@ async def test_add_money_to_wallet():
             await expect(page.locator("td[aria-describedby*='dx-col-3']").filter(has_text="USD")).to_have_count(1)
         
         # Get current money balance
-        current_money = await page.locator("td[aria-describedby*='dx-col-5']").text_content()
+        USD_row_locator = page.locator("//tr[td[contains(text(), 'USD')]]")
+        current_money = await USD_row_locator.locator("td[aria-describedby*='dx-col-5']").text_content()
         current_money = float(current_money.strip()) + 100.0
         
         # Press Add money button
@@ -92,7 +93,7 @@ async def test_add_money_to_wallet():
         await page.get_by_label("Adding money to wallet USD").get_by_label("Add").click()
         
         # Check if money was added
-        await expect(page.locator("td[aria-describedby*='dx-col-5']").filter(has_text=str(current_money))).to_have_count(1)
+        await expect(USD_row_locator.locator("td[aria-describedby*='dx-col-5']").filter(has_text=str(current_money))).to_have_count(1)
         
         await browser.close()
         
