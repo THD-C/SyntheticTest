@@ -80,6 +80,7 @@ async def test_buy_crypto_instant():
         await page.get_by_text("Confirm order").click()
 
         # Get number of operations after new order
+        await page.goto(cfg.LANDING_PAGE)
         await page.get_by_text("Stock", exact=True).click()
         await page.locator("xpath=//tbody/tr[1]/td[1]/div/dx-button/div/i").click()
 
