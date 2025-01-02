@@ -1,9 +1,7 @@
-from src.Helpers.RandomUser import RandomUser
 import src.Config as cfg
 from playwright.async_api import async_playwright, expect
 from src.Helpers.setupPlaywrightBrowser import setup_async
 import pytest
-import asyncio  # noqa: F401
 
 
 @pytest.mark.asyncio

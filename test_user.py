@@ -1,5 +1,5 @@
 from src.Helpers.RandomUser import RandomUser
-from playwright.async_api import async_playwright, BrowserType,Browser, Page, expect
+from playwright.async_api import async_playwright, expect
 import src.Config as cfg
 from src.Helpers.setupPlaywrightBrowser import setup_async
 import uuid

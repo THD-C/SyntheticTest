@@ -2,7 +2,6 @@ from playwright.async_api import async_playwright
 from src.Helpers.setupPlaywrightBrowser import setup_async
 import src.Config as cfg
 import pytest
-import asyncio  # noqa: F401
 
 @pytest.mark.asyncio
 async def test_login_with_username():
