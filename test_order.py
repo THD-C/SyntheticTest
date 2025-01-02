@@ -67,7 +67,7 @@ async def test_buy_crypto_instant():
             ).click()
 
         # Go to Stock tab
-        await page.get_by_text("Stock").click()
+        await page.get_by_text("Stock", exact=True).click()
 
         await page.wait_for_url("http://thdc/en/stock/list", timeout=5000)
 
@@ -82,10 +82,54 @@ async def test_buy_crypto_instant():
         await page.get_by_text("Confirm order").click()
 
         # Get number of operations after new order
-        await page.get_by_text("Stock").click()
+        await page.get_by_text("Stock", exact=True).click()
         await page.locator("xpath=//tbody/tr[1]/td[1]/div/dx-button/div/i").click()
 
         # Check if new operation was added
         expect(page.get_by_text(" -1.00 USD ")).to_have_count(ops_num + 1)
 
         await browser.close()
+
+@pytest.mark.asyncio
+async def test_sell_crypto_instant():
+    async with async_playwright() as playwright:
+        page, browser = await setup_async(playwright)
+
+        # Login
+        await page.get_by_text("Log in").click()
+        await page.wait_for_url(cfg.LOGIN_PAGE, timeout=5000)
+        await page.get_by_label("E-mail or username").fill(cfg.USERNAME)
+        await page.get_by_label("Password").fill(cfg.PASSWORD)
+        await page.get_by_text("Log in").click()
+        
+        # Go to Stock tab
+        await page.get_by_text("Stock", exact=True).click()
+
+        await page.wait_for_url("http://thdc/en/stock/list", timeout=5000)
+
+        # Click on search button in first row
+        await page.locator("xpath=//tbody/tr[1]/td[1]/div/dx-button/div/i").click()
+        
+        # Get number of operations before
+        buy_ops_num = await page.get_by_text(" -1.00 USD ").count()
+        sell_ops_num = await page.get_by_text(" +1.00 USD ").count()
+        
+        # Buy crypto if there are no operations
+        if buy_ops_num <= 0:
+            await page.get_by_text("Buy", exact=True).click()
+            await page.get_by_label("Amount").fill("1")
+            await page.get_by_text("Confirm order").click()
+        
+        await page.get_by_text("Sell", exact=True).click()
+        await page.get_by_label("Amount").fill("1")
+        await page.get_by_text("Confirm order").click()
+        
+        # Get number of operations after sell order
+        await page.get_by_text("Stock", exact=True).click()
+        await page.locator("xpath=//tbody/tr[1]/td[1]/div/dx-button/div/i").click()
+        
+        expect(page.get_by_text(" +1.00 USD ")).to_have_count(sell_ops_num + 1)
+        
+        
+        await browser.close()
+        
