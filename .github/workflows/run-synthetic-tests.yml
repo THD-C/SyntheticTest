@@ -30,4 +30,4 @@ jobs:
         run: |
           source ./.venv/bin/activate
           pytest
-          # python -m pytest -v tests/synthetic_tests.py
+          # python -m pytest -v  --disable-warnings
