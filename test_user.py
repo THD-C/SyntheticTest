@@ -2,6 +2,7 @@ from src.Helpers.RandomUser import RandomUser
 from playwright.async_api import async_playwright, BrowserType,Browser, Page, expect
 import src.Config as cfg
 from src.Helpers.setupPlaywrightBrowser import setup_async
+import uuid
 import pytest
 import asyncio
 
@@ -81,7 +82,6 @@ async def test_fill_in_personal_data():
         # Navigate to personal data page
         await page.get_by_text("Profile").click()
         
-        
         # Validate if the data was successfully saved
         await expect(page.get_by_label("Username")).to_have_value(user_account.username, timeout=5000)
         await expect(page.get_by_label("E-mail")).to_have_value(user_account.username_email, timeout=5000)
@@ -93,4 +93,44 @@ async def test_fill_in_personal_data():
         await expect(page.get_by_label("Country")).to_have_value("Poland", timeout=5000)
         
 
+        await browser.close()
+        
+@pytest.mark.asyncio
+async def test_change_password():
+    async with async_playwright() as playwright:
+        page, browser = await setup_async(playwright)
+        
+        user_account = RandomUser(page)
+        new_password = f"test_{uuid.uuid4()}"
+        
+        await user_account.register()
+        
+        # Open context menu
+        await page.get_by_title("Profile").click()
+
+        # Navigate to personal data page
+        await page.get_by_text("Profile").click()
+        
+        # Open Password panel
+        await page.locator("div.dx-item-content.dx-tab-content").filter(has_text="Password").click()
+        
+        # Fill in old and new password
+        await page.get_by_label("Old password").fill(user_account.password)
+        await page.get_by_label("New password").fill(new_password)
+        
+        await page.get_by_text("Change").click()
+        
+        # Log out
+        await page.get_by_title("Profile").click()
+        await page.get_by_text("Log out").click()
+        
+        # Log in with new password
+        await page.get_by_text("Log in").click()
+        await page.wait_for_url(cfg.LOGIN_PAGE, timeout=5000)
+        await page.get_by_label("E-mail or username").fill(user_account.username)
+        await page.get_by_label("Password").fill(new_password)
+        await page.get_by_text("Log in").click()
+        
+        await page.wait_for_url(cfg.LANDING_PAGE, timeout=5000)
+        
         await browser.close()
