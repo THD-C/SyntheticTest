@@ -125,6 +125,7 @@ async def test_sell_crypto_instant():
         await page.get_by_text("Confirm order").click()
         
         # Get number of operations after sell order
+        await page.goto(cfg.LANDING_PAGE)
         await page.get_by_text("Stock", exact=True).click()
         await page.wait_for_url("http://thdc/en/stock/list", timeout=5000)
         await page.locator("xpath=//tbody/tr[1]/td[1]/div/dx-button/div/i").click()
