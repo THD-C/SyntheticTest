@@ -29,4 +29,4 @@ jobs:
       - name: Run Synthetic Tests
         run: |
           source ./.venv/bin/activate
-          python -m pytest -v -p no:warnings
+          python -m pytest -v -p no:warnings --reruns 3

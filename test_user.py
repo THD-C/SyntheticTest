@@ -71,7 +71,8 @@ async def test_fill_in_personal_data():
         await page.get_by_label("Building").fill("1")
         await page.get_by_label("Country").fill("Poland")
         await page.locator('#buttonSave').dispatch_event('click')
-        await asyncio.sleep(5)
+        
+        # await asyncio.sleep(5)
         
         # Go back to the landing page
         await page.goto(cfg.LANDING_PAGE)
