@@ -134,3 +134,44 @@ async def test_change_password():
         await page.wait_for_url(cfg.LANDING_PAGE, timeout=5000)
         
         await browser.close()
+        
+@pytest.mark.asyncio
+async def test_delete_user():
+    async with async_playwright() as playwright:
+        page, browser = await setup_async(playwright)
+        
+        user_account = RandomUser(page)
+        
+        await user_account.register()
+        
+        # Log out
+        await page.get_by_title("Profile").click()
+        await page.get_by_text("Log out").click()
+        
+        # Login as admin
+        await page.get_by_text("Log in").click()
+        await page.wait_for_url(cfg.LOGIN_PAGE, timeout=5000)
+        await page.get_by_label("E-mail or username").fill(cfg.USERNAME)
+        await page.get_by_label("Password").fill(cfg.PASSWORD)
+        await page.get_by_text("Log in").click()
+        
+        # Open context menu
+        await page.get_by_title("Profile").click()
+
+        # Navigate to personal data page
+        await page.get_by_text("Admin").click()
+        
+        # Set items per page to 100
+        await page.get_by_label("Items per page: 100").click()
+        
+        # Locate the row containing the specific username
+        row_locator = page.locator(f"//tr[td[contains(text(), '{user_account.username}')]]")
+        
+        # Remove the user
+        await row_locator.get_by_title("Delete").click()
+        await page.get_by_text("Yes").click()
+        
+        # Check if user was removed
+        expect(page.locator(f"//tr[td[contains(text(), '{user_account.username}')]]")).to_have_count(0)
+        
+        await browser.close()
